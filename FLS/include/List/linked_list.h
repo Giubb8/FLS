@@ -21,7 +21,7 @@ typedef struct _list_element {
     int key;
     struct _list_element* next;
 } list_elem_t;
-
+ 
 /*
  * Tipo delle liste (di interi)
  * head è un puntatore alla testa della lista.

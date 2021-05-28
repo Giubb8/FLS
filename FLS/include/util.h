@@ -107,18 +107,18 @@ void m_connect(int sockfd,char* sname,int sfamily){
 
 void m_lock(pthread_mutex_t* mtx) {
   int error;
-  if(error=pthread_mutex_lock(mtx)!=0) {
+  if( (error=pthread_mutex_lock(mtx)) !=0) {
     errno=error;
     perror("\nLocking mutex: ");
     _exit(EXIT_FAILURE);
   }
-  printf("Mutex locked\n");
+  //if(DEBUG){printf("Mutex locked\n");}
   return;
 }
 
 void m_unlock(pthread_mutex_t* mtx) {
   int error;
-  if(error=pthread_mutex_unlock(mtx)!=0) {
+  if( (error=pthread_mutex_unlock(mtx))!=0) {
     errno=error;
     perror("\nUnlocking mutex: ");
     _exit(EXIT_FAILURE);
@@ -129,7 +129,7 @@ void m_unlock(pthread_mutex_t* mtx) {
 
 void m_wait(pthread_cond_t* cond, pthread_mutex_t* mtx) {
   int error;
-  if(error=pthread_cond_wait(cond, mtx)!=0) {
+  if((error=pthread_cond_wait(cond, mtx))!=0) {
     errno=error;
     perror("\nPreparing to wait for cond: ");
     _exit(EXIT_FAILURE);
@@ -139,7 +139,7 @@ void m_wait(pthread_cond_t* cond, pthread_mutex_t* mtx) {
 
 void m_signal(pthread_cond_t* cond) {
   int error;
-  if(error=pthread_cond_signal(cond)!=0) {
+  if((error=pthread_cond_signal(cond))!=0) {
     errno=error;
     perror("\nSignaling cond: ");
     _exit(EXIT_FAILURE);

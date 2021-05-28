@@ -15,8 +15,12 @@
 #include<sys/un.h>
 #include"./include/util.h"
 
-MAXSTRLEN  1024
+#ifndef DEBUG
+#define DEBUG 0
+#endif
 
+#define MAXSTRLEN 1024
+#define SOCKNAME "./fls"
 typedef struct message{
   char op;
   char args[MAXSTRLEN];
@@ -36,8 +40,8 @@ msg parsemsg(){
     exit(EXIT_FAILURE);
   }
   *ptropt++;//prendo la lettera dopo
-  ptrarg=strchr(buffer,' ');//cerco la stringa degli argomenti dopo lo spazio 
   message.op=*ptropt;
+  ptrarg=strchr(buffer,' ');//cerco la stringa degli argomenti dopo lo spazio 
   strcpy(message.args,ptrarg);
   if(DEBUG){printf("message: %c %s",message.op,message.args);}
   return message;
@@ -46,20 +50,24 @@ msg parsemsg(){
 
 int main(int argc, char const *argv[]) {
   int fd;
-  initconfig( argc, argv[1]);//configurazione file conf
-  printfconf();
-
+  
+  //initconfig( argc, argv[1]);//configurazione file conf
+  //printfconf();
+  char messaggio[257]="wewe sono il client";
 
   fd=socket(AF_UNIX,SOCK_STREAM,0);
-  m_connect(fd,global.socketname,AF_UNIX);
-  while(1){//TODO GESTIONE DEI SEGNALI 
-    msg message;
+  m_connect(fd,SOCKNAME,AF_UNIX);
+  printf("connessione lato client avvenuta: il mio fd e' %d\n",fd);
+  write(fd,messaggio,sizeof(messaggio));
+ 
+ /*while(1){//TODO GESTIONE DEI SEGNALI 
+    msg message;//TODO IL PARSING POSSO FARLO NEL SERVER
     message=parsemsg();//TODO non mi ricordo se posso copiare una struct cosi
     fscanf(stdin,"-c");
     //impacchetta
     //spedisce
   }
-
+*/
   close(fd);
   exit(EXIT_SUCCESS);
 

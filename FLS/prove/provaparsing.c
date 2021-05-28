@@ -34,7 +34,7 @@ void main(int argc, char const *argv[]){
        if(ptr==NULL){
         perror("Formato Input sbagliato");
         exit(EXIT_FAILURE);
-       }
+     }
        ptr2=strchr(buff,' ');
        *ptr++;
        char dodo=*ptr;

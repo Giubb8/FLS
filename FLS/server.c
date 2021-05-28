@@ -14,46 +14,89 @@
 #include<sys/socket.h>
 #include<sys/un.h>
 #include"./include/util.h"
-
+#include"./include/List/queue.h"
 #define TRUE 1
 #define FALSE 0
 
 #ifndef DEBUG
 #define DEBUG 0
 #endif
+pthread_mutex_t mutexqueue=PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t condvqueue=PTHREAD_COND_INITIALIZER;
+
+
 // #define DEBUG_PRINT(x) printf x
 //f:debug print
+
 void dprint(char * debugprint);
 
-int dispatcher(int fd){//TODO controllare se va bene cosi,nella prova ho fatto un assegnamento ad una vatiabile usiliaria
-  int fd_post;
-  char  buff[256];
-  while (1){//TODO GESTIONE DEI SEGNALI
-  printf("aspettando una connessione");
-  fd_post=m_accept(fd,NULL,0);
-  //TODO HANDLER DELLA RICHIESTA DA PARTE DEL CLIENT
-  }
-  return 0;
+void * handleconnection(void * arg){
+   int client_socket=*((int*)arg);
+   free(arg);
+   char  buffer[1024];
+   read(client_socket,buffer,sizeof(buffer));
+   printf("ricevuta richiesta da:%d,ho letto: %s\n",client_socket,buffer);
+   return 0;
 }
 
-int main(int argc, char const *argv[]) {
-  int s_fd,s_fdpost;//fd per socket
-  int error;
 
+void * threadfunction(void * arg){
+  while(1){//TODO vedere quando termina
+    int * fd_client;
+    m_lock(&mutexqueue);
+    if( (fd_client=dequeue())==NULL){
+      m_wait(&condvqueue,&mutexqueue);
+      fd_client=dequeue(); 
+    }
+    m_unlock(&mutexqueue);
+    if(fd_client!=NULL){
+      handleconnection(fd_client);
+    }
+  }
+}
+void* dispatcher(void * p_fd){//TODO controllare se va bene cosi,nella prova ho fatto un assegnamento ad una vatiabile usiliaria
+  int fd=*((int*)p_fd);
+  int fd_post;
+  //char buff[256];
+  //creiamo la pool di thread e gli assegniamo la funzione di accettazione
+  pthread_t thread_pool[global.nworkers];
+  for (int i = 0; i < global.nworkers; i++){
+    pthread_create(&thread_pool[i],NULL,threadfunction,NULL);
+  }
+  while (1){//TODO GESTIONE DEI SEGNALI
+    if(DEBUG){printf("aspettando una connessione...\n");}
+    fd_post=m_accept(fd,NULL,0);
+    if(DEBUG){ printf("connessione avvenuta con %d\n",fd_post);}
+
+    int *fd_client=malloc(sizeof(int));
+    *fd_client=fd_post;
+    
+    m_lock(&mutexqueue);
+    enqueue(fd_client);
+    m_signal(&condvqueue);
+    m_unlock(&mutexqueue); 
+  }
+    return 0;
+
+}
+int main(int argc, char const *argv[]) {
+  int s_fd;//fd per socket
+  //int s_fdpost;
+  int error;
   pthread_t d_tid;
 
   initconfig( argc, argv[1]);//configurazione file conf
   printfconf();
-  
+
   // creazione e inizializzazione della socket
   s_fd=m_socket(AF_UNIX,SOCK_STREAM,0);
   m_bind(s_fd,global.socketname,AF_UNIX);
   m_listen(s_fd,SOMAXCONN);
-  s_fdpost=m_accept(s_fd,NULL,0);
+  //s_fdpost=m_accept(s_fd,NULL,0);
 
 
   // TODO CONTROLLARE ARGOMENTI FUNZIONE PRIMA DI PANICARE
-  if( (error=pthread_create(&d_tid,NULL, &dispatcher,s_fd)) !=0){
+  if( (error=pthread_create(&d_tid,NULL, &dispatcher,&s_fd)) !=0){
     errno=error;
     perror("\nCreating dispatcher thread: ");
     _exit(EXIT_FAILURE);
@@ -70,7 +113,7 @@ int main(int argc, char const *argv[]) {
   }
   // chiusura
   close(s_fd);
-  close(s_fdpost);
+  //close(s_fdpost);
   unlink(global.socketname);
   exit(EXIT_SUCCESS);
   return 0;

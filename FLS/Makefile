@@ -1,9 +1,12 @@
 CC=gcc
-CFLAGS =-lpthread -Wall -g
+CFLAGS =-pthread -Wall -g
 DEBUG 		= -DDEBUG
 INCLUDE = linked_list.c
+SOCKETNAME =fls
 
 all:server client
+
+d_all:sdebug cdebug
 
 server: server.c
 	$(CC) $(CFLAGS) server.c  -o $@
@@ -18,4 +21,4 @@ cdebug: client.c
 	$(CC) $(CFLAGS) client.c  $(DEBUG) -o client
 
 clean:
-	rm server; rm client;
+	rm server; rm client; unlink $(SOCKETNAME);
