@@ -11,14 +11,19 @@
 
 #ifndef linked_list_h
 #define linked_list_h
+#define MAXSTRLEN 1024
 
+typedef struct message{
+  char op;
+  char args[MAXSTRLEN];
+}msg;
 /*
  * Elemento di lista .
  * val è il valore contenuto nell'elemento .
  * next è il puntatore all'elemento successivo.
  */
 typedef struct _list_element {
-    int key;
+    msg key;
     struct _list_element* next;
 } list_elem_t;
  
@@ -53,7 +58,7 @@ void destroy_list(list_t* list);
  *
  * Tempo: Θ(1)
  */
-void head_insert(list_t* list, int elem);
+void head_insert(list_t* list, msg elem);
 
 /*
  * Inserisce l'intero passato come secondo parametro
@@ -61,7 +66,7 @@ void head_insert(list_t* list, int elem);
  *
  * Tempo: Θ(1)
  */
-void tail_insert(list_t* list, int elem);
+void tail_insert(list_t* list, msg elem);
 
 /*
  * Rimuove la testa della lista passata come parametro.
@@ -83,7 +88,7 @@ void tail_remove(list_t* list);
  *
  * Tempo: Θ(p) = O(n) dove p è la posizione di k nella lista.
  */
-void key_remove(list_t* list, int k);
+void key_remove(list_t* list, char k);
 
 /*
  * Restituisce 1 se l'elemento k è presente nella lista list,
@@ -91,7 +96,7 @@ void key_remove(list_t* list, int k);
  *
  * Tempo: Θ(p) = O(n) dove p è la posizione di k nella lista.
  */
-int contains(list_t* list, int k);
+int contains(list_t* list, char k);
 
 /*
  * Funzione di utilità per stampare una lista.

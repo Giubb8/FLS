@@ -15,10 +15,10 @@ client: client.c
 	$(CC) $(CFLAGS) client.c  -o $@
 
 sdebug: server.c
-	$(CC) $(CFLAGS) server.c  $(DEBUG) -o server
+	$(CC) $(CFLAGS)  server.c  $(DEBUG) -o server
 
 cdebug: client.c
-	$(CC) $(CFLAGS) client.c  $(DEBUG) -o client
+	$(CC) $(CFLAGS) include/List/linked_list.c client.c  $(DEBUG) -o client
 
 clean:
 	rm server; rm client; unlink $(SOCKETNAME);

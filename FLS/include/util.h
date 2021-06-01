@@ -1,10 +1,28 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#include<time.h>
+#include<pthread.h>
+#include<limits.h>
+#include<stdint.h>
+#include<signal.h>
+#include<errno.h>
+#include<unistd.h>
+#include<stdarg.h>
+#include<sys/types.h>
+#include<sys/socket.h>
+#include<sys/un.h>
 
+#ifndef DEBUG
+#define DEBUG 0
+#endif
 //struttura dati per la configurazione iniziale
 typedef struct conf{
   int nworkers;//numero di thread workers
   int dim;//dimensione dello spazio di memorizzazione
   char*socketname;//nome della socket
 }conf;
+
 conf global;
 
 //configurazione dal file di testo config.txt
@@ -112,7 +130,7 @@ void m_lock(pthread_mutex_t* mtx) {
     perror("\nLocking mutex: ");
     _exit(EXIT_FAILURE);
   }
-  //if(DEBUG){printf("Mutex locked\n");}
+  if(DEBUG){printf("Mutex locked\n");}
   return;
 }
 
@@ -123,7 +141,7 @@ void m_unlock(pthread_mutex_t* mtx) {
     perror("\nUnlocking mutex: ");
     _exit(EXIT_FAILURE);
   }
-  printf("Mutex unlocked\n");
+  if(DEBUG){printf("Mutex unlocked\n");}
   return;
 }
 
@@ -134,6 +152,8 @@ void m_wait(pthread_cond_t* cond, pthread_mutex_t* mtx) {
     perror("\nPreparing to wait for cond: ");
     _exit(EXIT_FAILURE);
   }
+  if(DEBUG){printf("Wait in corso\n");}
+
   return;
 }
 
@@ -144,5 +164,29 @@ void m_signal(pthread_cond_t* cond) {
     perror("\nSignaling cond: ");
     _exit(EXIT_FAILURE);
   }
+  if(DEBUG){printf("Signal inviata\n");}
   return;
 }
+/*
+int countOccurrences(char * str, char * toSearch){
+    int i, j, found, count;
+    int stringLen, searchLen;
+    stringLen = strlen(str);      // length of string
+    searchLen = strlen(toSearch); // length of word to be searched
+    count = 0;
+    for(i=0; i <= stringLen-searchLen; i++){
+        //Match word with string 
+        found = 1;
+        for(j=0; j<searchLen; j++){
+            if(str[i + j] != toSearch[j]){
+                found = 0;
+                break;
+            }
+        }
+        if(found == 1){
+            count++;
+        }
+    }
+    return count;
+}
+*/

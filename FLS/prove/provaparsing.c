@@ -36,11 +36,17 @@ void main(int argc, char const *argv[]){
         exit(EXIT_FAILURE);
      }
        ptr2=strchr(buff,' ');
+       char*tmp=strtok(ptr2," ");
+      char*tmp1=strtok(tmp," ");
+
        *ptr++;
        char dodo=*ptr;
        
        printf("dodo %c\n",dodo);
        printf("wewe %s\n",ptr2);
+       printf("dopo %s\n",tmp);
+              printf("dopffo %s\n",tmp1);
+
        //fgets(buff)
    } 
     //Legge da stdinput

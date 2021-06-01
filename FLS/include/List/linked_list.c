@@ -34,7 +34,7 @@ void destroy_list(list_t* list) {
  *
  * Tempo: Θ(1)
  */
-void head_insert(list_t* list, int elem) {
+void head_insert(list_t* list, msg elem) {
     list_elem_t* new = malloc(sizeof(list_elem_t));
     new->key = elem;
     new->next = list->head; // La nuova testa ha come successore la vecchia
@@ -52,7 +52,7 @@ void head_insert(list_t* list, int elem) {
  *
  * Tempo: Θ(1)
  */
-void tail_insert(list_t* list, int elem) {
+void tail_insert(list_t* list, msg elem) {
     list_elem_t* new = malloc(sizeof(list_elem_t));
     new->key = elem;
     new->next = NULL; // Poiché inseriamo in coda, new non ha successori
@@ -131,11 +131,11 @@ void tail_remove(list_t* list) {
  *
  * Tempo: Θ(p) = O(n) dove p è la posizione di k nella lista.
  */
-void key_remove(list_t* list, int k) {
+void key_remove(list_t* list, char k) {
     list_elem_t* prev = NULL;
     list_elem_t* curr = list->head;
     
-    while(curr != NULL && curr->key != k) {
+    while(curr != NULL && curr->key.op != k) {
         prev = curr;
         curr = curr->next;
     }
@@ -163,9 +163,9 @@ void key_remove(list_t* list, int k) {
  *
  * Tempo: O(n)
  */
-int contains(list_t* list, int k) {
+int contains(list_t* list, char k) {
     list_elem_t* curr = list->head;
-    while(curr != NULL && curr->key != k) {
+    while(curr != NULL && curr->key.op != k) {
         curr = curr->next;
     }
     
@@ -183,7 +183,7 @@ void print_list(list_t* list) {
     
     printf("Contenuto della lista:\n");
     while(curr != NULL) {
-        printf("%i ", curr->key);
+        printf("%c %s", curr->key.op,curr->key.args);
         curr = curr->next;
     }
     printf("\n");
