@@ -1,5 +1,5 @@
 
-static int fd;
+int fd;
 /*
 Viene aperta una connessione AF_UNIX al socket file sockname. Se il server non accetta immediatamente la
 richiesta di connessione, la connessione da parte del client viene ripetuta dopo ‘msec’ millisecondi e fino allo
@@ -7,9 +7,7 @@ scadere del tempo assoluto ‘abstime’ specificato come terzo argomento. Ritor
 di fallimento, errno viene settato opportunamente.
 */
 int openConnection(const char* sockname, double msec, const struct timespec abstime){
-    printf("msec %lf\n",msec);
     double waitime=msec/1000.0;
-    printf("wait e' %lf\n",waitime);
     double waited=0;
     fd=m_socket(AF_UNIX,SOCK_STREAM,0);
     struct sockaddr_un sa;
@@ -19,8 +17,8 @@ int openConnection(const char* sockname, double msec, const struct timespec abst
       if(errno==ENOENT){
         sleep(waitime);
         waited+=(waitime);
-        printf("waited e' %lf\n",waited);
-        printf("client sta aspettando da: %lf ...\n",waited);
+        if(DEBUG){printf("waited e' %lf\n",waited);}
+        if(DEBUG){printf("client sta aspettando da: %lf ...\n",waited);}
       }
       else return(-1);
     }
@@ -50,13 +48,36 @@ parametro ‘buf’, mentre ‘size’ conterrà la dimensione del buffer dati (
 caso di errore, ‘buf‘e ‘size’ non sono validi. Ritorna 0 in caso di successo, -1 in caso di fallimento, errno viene
 settato opportunamente.
 */
-int openFile(const char* pathname, int flags);
+int openFile(const char* pathname, int flags){
+  if(DEBUG){printf("dentro OPEN FILE, ricevuto %s\n",pathname);}
+  msg message;
+  int err;
+  message.op='o';
+  strcpy(message.args,pathname);
+  message.flag=flags; 
+  char buffer[MAXSTRLEN];
+  int w=writen(fd,&message,sizeof(message));//TODO GESTIONE ERRORE DA PARTE DEL SERVER
+  if(DEBUG){printf("SCRITTI SUL SERVER w=%d\n",w);}
+  int r=read(fd,&err,sizeof(err));  
+  if(DEBUG){printf("RICEVUTO DAL SERVER_ %d\n",err);}
+  return err;
+}
+
+
 /*Richiede al server la lettura di ‘N’ files qualsiasi da memorizzare nella directory ‘dirname’ lato client. Se il server
 ha meno di ‘N’ file disponibili, li invia tutti. Se N<=0 la richiesta al server è quella di leggere tutti i file
 memorizzati al suo interno. Ritorna un valore maggiore o uguale a 0 in caso di successo (cioè ritorna il n. di file
 effettivamente letti), -1 in caso di fallimento, errno viene settato opportunamente.
 */
-int readFile(const char* pathname, void** buf, size_t* size);
+int readFile(const char* pathname, void** buf, size_t* size){
+  rep reply;
+  msg message;
+  message.op='r';
+  strcpy(message.args,pathname);
+  int w=writen(fd,&message,sizeof(message));//TODO GESTIONE ERRORE DA PARTE DEL SERVER
+  int r=read(fd,&reply,size);//ho comunque il buffer puntato quindi posso copiare nella cartella nel chiamante 
+  memcpy(*buf,reply.args);
+}
 /*Richiede al server la lettura di ‘N’ files qualsiasi da memorizzare nella directory ‘dirname’ lato client. Se il server
 ha meno di ‘N’ file disponibili, li invia tutti. Se N<=0 la richiesta al server è quella di leggere tutti i file
 memorizzati al suo interno. Ritorna un valore maggiore o uguale a 0 in caso di successo (cioè ritorna il n. di file

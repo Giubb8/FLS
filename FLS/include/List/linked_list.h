@@ -16,7 +16,14 @@
 typedef struct message{
   char op;
   char args[MAXSTRLEN];
+  char dest[MAXSTRLEN];
+  int flag;
 }msg;
+
+typedef struct rep{
+  char args[MAXSTRLEN];
+  int err;
+}rep;
 /*
  * Elemento di lista .
  * val è il valore contenuto nell'elemento .

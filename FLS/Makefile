@@ -15,7 +15,7 @@ client: client.c
 	$(CC) $(CFLAGS) client.c  -o $@
 
 sdebug: server.c
-	$(CC) $(CFLAGS)  server.c  $(DEBUG) -o server
+	$(CC) $(CFLAGS) include/List/linked_list.c server.c  $(DEBUG) -o server
 
 cdebug: client.c
 	$(CC) $(CFLAGS) include/List/linked_list.c client.c  $(DEBUG) -o client

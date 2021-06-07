@@ -12,24 +12,102 @@
 #include<sys/types.h>
 #include<sys/socket.h>
 #include<sys/un.h>
+#include<sys/param.h>
+#include <fcntl.h>
 #include"./include/util.h"
+#include"./include/List/linked_list.h"
 #include"./include/List/queue.h"
+
 #define TRUE 1
 #define FALSE 0
 
 #ifndef DEBUG
 #define DEBUG 0
 #endif
+
+char*toreadpath="SERVER/TO_READ/";
 pthread_mutex_t mutexqueue=PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t condvqueue=PTHREAD_COND_INITIALIZER;
 
+void printmsg(msg request){
+  printf("Message :\nOP: %c\nARG:%s\nDEST: %s\nFLAG:%d\n",request.op,request.args,request.dest,request.flag);
+}
 
+msg copymsg(msg to_copy){
+  msg to_ret;
+  to_ret.op=to_copy.op;
+  strcpy(to_ret.args,to_copy.args);
+  strcpy(to_ret.dest,to_copy.dest);
+  to_ret.flag=to_copy.flag;
+  return to_ret;
+}
+
+
+FILE* handle_o(msg request,int client_socket){//TODO IMPLEMENTARE RIMOZIONE FILE SE ECCESSO
+  
+  char * path=realpath(request.args,NULL);
+  if(path==NULL && request.flag==O_CREAT){
+
+    char nullpath[MAXPATHLEN];
+    strcat(nullpath,toreadpath);
+    strcat(nullpath,request.args);
+    if(DEBUG){printf("HANDLE_O: CREAZIONE FILE IN PATH %s\n",nullpath);}
+
+    //char err[256]="201";
+    int err =0;
+    FILE* fileto_o=fopen(nullpath,"w+");
+    if(fileto_o==NULL){
+      err=-1;
+      writen(client_socket,&err,sizeof(err));
+      printf("file %s NON creato ERRORE\n",request.args);
+
+    }
+    else{
+      writen(client_socket,&err,sizeof(err));
+      printf("file %s creato\n",request.args);
+    }
+  }
+  else if(path!=NULL && request.flag!=O_CREAT){
+    int err =0;
+    FILE *fileto_o=fopen(path,"r+");
+    if(fileto_o==NULL){
+      err=-1;
+      writen(client_socket,&err,sizeof(err));
+      printf("file %s NON aperto ERRORE\n",request.args);
+    }
+    else{
+      writen(client_socket,&err,sizeof(err));
+      printf("file %s aperto\n",request.args);
+    }
+  }
+  else if(path!=NULL && request.flag==O_CREAT){
+    int err=-2;
+    writen(client_socket,&err,sizeof(err));
+    printf("file già esistente,flag errato\n");
+  }
+}
+
+
+int handleoperation(msg request,int client_socket){
+  char op=request.op;
+  switch(op){
+    case 'o':
+      handle_o(request,client_socket);
+      break;
+    case 'r':
+      //handle_r();
+      break;
+  }return 0;
+}
 void * handleconnection(void * arg){
    int client_socket=*((int*)arg);
    free(arg);//free effettuata subito perchè arg non mi serve più
-   char  buffer[1024];
-   read(client_socket,buffer,sizeof(buffer));
-   printf("ricevuta richiesta da:%d,ho letto: %s\n",client_socket,buffer);
+   //char  buffer[1024];
+   msg request;
+   readn(client_socket,&request,sizeof(request));
+   printmsg(request);
+  // printf("ricevuta richiesta da:%d,ho letto: %s\n",client_socket,buffer);
+   handleoperation(request,client_socket);
    return 0;
 }
 
