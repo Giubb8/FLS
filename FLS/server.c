@@ -26,6 +26,9 @@
 #endif
 
 char*toreadpath="SERVER/TO_READ/";
+int capacity=0;
+
+pthread_mutex_t capacitymutex=PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutexqueue=PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t condvqueue=PTHREAD_COND_INITIALIZER;
 
@@ -160,6 +163,7 @@ int main(int argc, char const *argv[]) {
   pthread_t d_tid;//thread id per il dispatcher
 
   initconfig( argc, argv[1]);//configurazione file conf
+  capacity=global.dim;
   printfconf();
 
   // creazione e inizializzazione della socket
