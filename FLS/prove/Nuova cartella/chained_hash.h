@@ -25,16 +25,16 @@
  * le manteniamo separate
  */
 
-typedef struct files{
+typedef struct file_s{
     FILE* fp;
     char fname[100];
     int size;
     int order;
-}files;
+}file_s;
 
 typedef struct _list_elem {
     int key;
-    files val;
+    file_s val;
     struct _list_elem* next;
 } list_elem_t;
 
@@ -52,13 +52,13 @@ chained_hash_t* new_hash_table(int m);
 void hash_destroy(chained_hash_t* T);
 
 /* Inserimento di elem (con chiave k) nella tabella hash T */
-void chained_hash_insert(chained_hash_t* T, int k, files elem);
+void chained_hash_insert(chained_hash_t* T, int k, file_s elem);
 
 /* Ricerca della chiave k nella tabella hash T.
  * Tramite *result si ottiene il valore associato alla chiave
  * Restituisce 0 se la chiave non è presente, 1 altrimenti.
  */
-int chained_hash_search(chained_hash_t* T, int k, files* result,char *name);
+int chained_hash_search(chained_hash_t* T, int k, file_s* result,char *name);
 
 /* Cancellazione dell'elemento di chiave k nella tabella hash T */
 void chained_hash_delete(chained_hash_t* T, int k,char* name);

@@ -12,16 +12,19 @@
 #ifndef linked_list_h
 #define linked_list_h
 #define MAXSTRLEN 1024
+#define MAXFILESIZE 40960
 
 typedef struct message{
   char op;
   char args[MAXSTRLEN];
   char dest[MAXSTRLEN];
   int flag;
+  int more;
 }msg;
 
 typedef struct rep{
-  char args[MAXSTRLEN];
+  char args[MAXFILESIZE];
+  int done;
   int err;
 }rep;
 /*

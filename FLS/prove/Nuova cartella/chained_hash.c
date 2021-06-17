@@ -28,12 +28,12 @@ unsigned long compute_hash( char *str){//http://www.cse.yorku.ca/~oz/hash.html
     return hash;
 }
 
-void printfiles(files file){
+void printfiles(file_s file){
   printf("name: %s size: %d,order : %d,puntatore %p\n",file.fname,file.size,file.order,file.fp);
 }
 
-void print_list(list_elem_t* list) {
-    list_elem_t* curr = list;
+void print_list(list_elem_th* list) {
+    list_elem_th* curr = list;
     
     printf("Contenuto della lista:\n");
     while(curr != NULL) {
@@ -56,7 +56,7 @@ chained_hash_t* new_hash_table(int m) {
     
     /* Allocazione della memoria */
     chained_hash_t* T = malloc(sizeof(chained_hash_t));
-    T->table = malloc(m * sizeof(list_elem_t*));
+    T->table = malloc(m * sizeof(list_elem_th*));
     T->m = m;
     
     for(i=0;i<m;i++) {
@@ -74,11 +74,11 @@ void hash_destroy(chained_hash_t* T) {
     int i;
     int m = T->m;
     for(i=0;i<m;i++) {
-        list_elem_t* lista = T->table[i];
+        list_elem_th* lista = T->table[i];
         
         /* Deallocazione dell'intera lista in posizione i */
         while(lista != NULL) {
-            list_elem_t* tmp = lista;
+            list_elem_th* tmp = lista;
             lista = lista->next; // Avanza nella lista
             free(tmp); // Libera il blocco precedente
         }
@@ -94,12 +94,12 @@ void hash_destroy(chained_hash_t* T) {
  * NON non controlla se la chiave è già presente nella tabella.
  * Tempo: O(1 + alpha) = O(1)
  */
-void chained_hash_insert(chained_hash_t* T, int k, files elem) {
+void chained_hash_insert(chained_hash_t* T, int k, file_s elem) {
     /* Calcolo dell'hash */
     //int posizione = hash(k, T->m);
     int posizione = ((compute_hash(elem.fname))%T->m);
     printf("posizione calcolata: %d\n",posizione);
-    list_elem_t* new_elem = malloc(sizeof(list_elem_t));
+    list_elem_th* new_elem = malloc(sizeof(list_elem_th));
     new_elem->key = k;
     new_elem->val = elem;
     new_elem->next = T->table[posizione]; // NULL se la lista era vuota
@@ -113,9 +113,9 @@ void chained_hash_insert(chained_hash_t* T, int k, files elem) {
  *
  * Tempo O(1 + alpha) = O(1)
  */
-int chained_hash_search(chained_hash_t* T, int k, files* result,char* name) {
+int chained_hash_search(chained_hash_t* T, int k, file_s* result,char* name) {
     int posizione = ((compute_hash(name))%T->m);
-    list_elem_t* lista = T->table[posizione];
+    list_elem_th* lista = T->table[posizione];
     while(lista != NULL && ((strcmp(lista->val.fname,name))!=0)){
         printf("dentro while search\n");
         lista = lista->next;
@@ -138,9 +138,9 @@ int chained_hash_search(chained_hash_t* T, int k, files* result,char* name) {
 void chained_hash_delete(chained_hash_t* T, int k,char * name) {
     //int pos = hash(k, T->m);
     int pos = ((compute_hash(name))%T->m);
-    list_elem_t* current = T->table[pos];
+    list_elem_th* current = T->table[pos];
     
-    list_elem_t* previous = NULL;
+    list_elem_th* previous = NULL;
     while(current != NULL && ((strcmp(current->val.fname,name))!=0)) {
         previous = current;
         current = current->next;

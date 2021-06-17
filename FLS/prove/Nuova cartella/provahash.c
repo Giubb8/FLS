@@ -4,11 +4,11 @@
 #include"chained_hash.h"
 #include<string.h>
 /*
-typedef struct files{
+typedef struct file_s{
     FILE* fp;
     int size;
     int order;
-}files;*/
+}file_s;*/
 
 
 int main(int argc, char const *argv[])
@@ -28,7 +28,7 @@ int main(int argc, char const *argv[])
         strcat(name,num);
         printf("name: %s\n",name);
         FILE *fpp=fopen(name,"w+");
-        files* newf=malloc(sizeof(files));
+        file_s* newf=malloc(sizeof(file_s));
         newf->size=0;
         newf->order=i;
         newf->fp=fpp;
@@ -38,7 +38,7 @@ int main(int argc, char const *argv[])
     }
     printhash(hasht);
     printf("QUA\n");
-    files* filer=malloc(sizeof(files));
+    file_s* filer=malloc(sizeof(file_s));
     printf("qui\n");
     chained_hash_search(hasht, 8, filer, "file8");
     printf("WEWE\n");

@@ -12,29 +12,43 @@
  * (Quindi il .c nel gcc e il .h nel vostro file)
  *
  */
+#include <math.h> /* Necessaria solo per l'ultima funzione hash */
 
 
 #ifndef chained_hash_h
 #define chained_hash_h
 
-#include <math.h> /* Necessaria solo per l'ultima funzione hash */
 
 /* Elemento contenuto nella tabella hash (elemento di lista)
  * Contiene chiave e valore.
  * Spesso chiave e valore coincidono, ma per essere più generali
  * le manteniamo separate
  */
+
+typedef struct file_s{
+    FILE* fp;
+    char fname[100];
+    int size;
+    int order;
+}file_s;
+
 typedef struct _list_elem {
     int key;
-    int val;
+    file_s val;
     struct _list_elem* next;
-} list_elem_t;
+} list_elem_th;
 
 /* Tipo delle tabelle hash con liste di trabocco */
 typedef struct {
-    list_elem_t** table; /* Tabella Hash (array di liste) */
+    list_elem_th** table; /* Tabella Hash (array di liste) */
     int m; /* Dimensione della tabella */
 } chained_hash_t;
+
+
+void printfiles(file_s file);
+void print_listh(list_elem_th* list) ;
+void printhash(chained_hash_t *T);
+
 
 /* Creazione di una nuova tabella hash di m posizioni */
 chained_hash_t* new_hash_table(int m);
@@ -43,16 +57,16 @@ chained_hash_t* new_hash_table(int m);
 void hash_destroy(chained_hash_t* T);
 
 /* Inserimento di elem (con chiave k) nella tabella hash T */
-void chained_hash_insert(chained_hash_t* T, int k, int elem);
+void chained_hash_insert(chained_hash_t* T, int k, file_s elem);
 
 /* Ricerca della chiave k nella tabella hash T.
  * Tramite *result si ottiene il valore associato alla chiave
  * Restituisce 0 se la chiave non è presente, 1 altrimenti.
  */
-int chained_hash_search(chained_hash_t* T, int k, int* result);
+int chained_hash_search(chained_hash_t* T, int k, file_s* result,char *name);
 
 /* Cancellazione dell'elemento di chiave k nella tabella hash T */
-void chained_hash_delete(chained_hash_t* T, int k);
+void chained_hash_delete(chained_hash_t* T, int k,char* name);
 
 /*
  * Funzione hash di base: (key modulo m)

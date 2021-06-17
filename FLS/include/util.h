@@ -220,3 +220,23 @@ ssize_t writen(int fd, void *ptr, size_t n) {  /* Write "n" bytes to a descripto
    }
    return(n - nleft); /* return >= 0 */
 }
+
+void createpath(char ** ret,char * str1,char * str2){
+  char returnpath[1000];
+  strcpy(returnpath,str1);
+  printf("returnpath intermedio: %s\n",returnpath);
+  strcat(returnpath,str2);
+ // strcat(returnpath,"/");
+  remove_spaces(returnpath);
+  printf("returnpath finale: %s\n",returnpath);
+  strcpy(ret,returnpath);
+}
+
+void remove_spaces(char* s) {//https://stackoverflow.com/questions/1726302/removing-spaces-from-a-string-in-c
+    const char* d = s;
+    do {
+        while (*d == ' ') {
+            ++d;
+        }
+    } while (*s++ = *d++);
+}
